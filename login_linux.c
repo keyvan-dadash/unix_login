@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <crypt.h>
 /* Uncomment next line in step 2 */
-/* #include "pwent.h" */
+ #include "pwent.h" 
 
 #define TRUE 1
 #define FALSE 0
@@ -26,8 +26,9 @@ void sighandler() {
 
 int main(int argc, char *argv[]) {
 
-	struct passwd *passwddata; /* this has to be redefined in step 2 */
+	/*struct passwd *passwddata; [> this has to be redefined in step 2 <]*/
 	/* see pwent.h */
+    mypwent *passwddata;
 
 	char important1[LENGTH] = "**IMPORTANT 1**";
 
@@ -52,8 +53,13 @@ int main(int argc, char *argv[]) {
 		fflush(NULL); /* Flush all  output buffers */
 		__fpurge(stdin); /* Purge any data in stdin buffer */
 
-		if (gets(user) == NULL) /* gets() is vulnerable to buffer */
+		if (fgets(user, LENGTH, stdin) == NULL) /* gets() is vulnerable to buffer */
 			exit(0); /*  overflow attacks.  */
+
+        char *ch = user;
+        while (*ch != '\n') ch++; 
+        *ch = '\0';
+
 
 		/* check to see if important variable is intact after input of login name - do not remove */
 		printf("Value of variable 'important 1' after input of login name: %*.*s\n",
@@ -62,21 +68,31 @@ int main(int argc, char *argv[]) {
 		 		LENGTH - 1, LENGTH - 1, important2);
 
 		user_pass = getpass(prompt);
-		passwddata = getpwnam(user);
+		passwddata = mygetpwnam(user);
 
 		if (passwddata != NULL) {
 			/* You have to encrypt user_pass for this to work */
 			/* Don't forget to include the salt */
 
-			if (!strcmp(user_pass, passwddata->pw_passwd)) {
+            // crypt function takes first two char out of true password as salt. 
+            // True password also has those two chars in the password before the real password begins.
+            char *hashed_pass = crypt(user_pass, passwddata->passwd_salt);
+            if (!hashed_pass)
+                return 2;
+
+            printf("entered: %s vs true: %s\n", hashed_pass, passwddata->passwd);
+			if (!strcmp(hashed_pass, passwddata->passwd)) {
 
 				printf(" You're in !\n");
 
 				/*  check UID, see setuid(2) */
 				/*  start a shell, use execve(2) */
 
+                return 0;
+
 			}
 		}
+
 		printf("Login Incorrect \n");
 	}
 	return 0;
