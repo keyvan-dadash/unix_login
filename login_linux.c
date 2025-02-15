@@ -17,11 +17,16 @@
 #define TRUE 1
 #define FALSE 0
 #define LENGTH 16
+#define PASS_AGE 10
 
 void sighandler() {
 
 	/* add signalhandling routines here */
 	/* see 'man 2 signal' */
+}
+
+void alert_user() {
+    printf("\033[1;31mWarning:\033[0m Change your password!\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -83,6 +88,13 @@ int main(int argc, char *argv[]) {
             printf("entered: %s vs true: %s\n", hashed_pass, passwddata->passwd);
 			if (!strcmp(hashed_pass, passwddata->passwd)) {
 
+                passwddata->pwage++;
+                passwddata->pwfailed = 0;
+                mysetpwent(user, passwddata);
+
+                if (passwddata->pwage >= PASS_AGE)
+                    alert_user();
+
 				printf(" You're in !\n");
 
 				/*  check UID, see setuid(2) */
@@ -90,7 +102,10 @@ int main(int argc, char *argv[]) {
 
                 return 0;
 
-			}
+			} else {
+                passwddata->pwfailed++;
+                mysetpwent(user, passwddata);
+            }
 		}
 
 		printf("Login Incorrect \n");
