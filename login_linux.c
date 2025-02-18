@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
 
 	char important1[LENGTH] = "**IMPORTANT 1**";
 
-	char user[LENGTH];
+	char user[LENGTH + 1];
+    user[LENGTH] = '\n';
 
 	char important2[LENGTH] = "**IMPORTANT 2**";
 
