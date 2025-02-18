@@ -108,11 +108,6 @@ int main(int argc, char *argv[]) {
 
 				/*  check UID, see setuid(2) */
 				/*  start a shell, use execve(2) */
-
-                if (setuid(passwddata->uid)) {
-                    printf("Error assigning user permissions");
-                    continue;
-                }
                 
                 char* args[] = {NULL};
                 char* env[] = {NULL};
