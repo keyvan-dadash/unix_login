@@ -22,9 +22,9 @@
 #define MAX_FAILED 5
 
 void sighandler() {
-    signal(SIGTERM, SIG_IGN);
-    signal(SIGINT, SIG_IGN);
-    signal(SIGQUIT, SIG_IGN);
+    for (int i = 0 ; i < 32; i++)
+        signal(i, SIG_IGN);
+        
 	/* add signalhandling routines here */
 	/* see 'man 2 signal' */
 }
