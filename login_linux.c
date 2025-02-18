@@ -142,8 +142,6 @@ int main(int argc, char *argv[]) {
                     }
                 }
 
-                return 0;
-
 			} else {
                 sleep(2);
                 passwddata->pwfailed++;
