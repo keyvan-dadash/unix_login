@@ -21,7 +21,17 @@
 #define MAX_FAILED 5
 
 void sighandler() {
+    signal(SIGTERM, SIG_IGN);
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+	/* add signalhandling routines here */
+	/* see 'man 2 signal' */
+}
 
+void reset_sighandler() {
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
 	/* add signalhandling routines here */
 	/* see 'man 2 signal' */
 }
@@ -106,6 +116,46 @@ int main(int argc, char *argv[]) {
 
 				/*  check UID, see setuid(2) */
 				/*  start a shell, use execve(2) */
+
+                if (setuid(passwddata->uid)) {
+                    printf("Error assigning user permissions");
+                    continue;
+                }
+                
+                char* args[] = {};
+                char* env[] = {};
+
+                pid_t pid = fork();
+                switch (pid)
+                {
+                case 0:
+                    if (setuid(passwddata->uid) == -1) {
+                        printf("Error assigning user permissions");
+                        exit(1);
+                    }
+                    
+                    if (execve("/bin/sh", args, env) == -1) {
+                        printf("Could now execute login shell");
+                        exit(1);
+                    }
+
+                    break;
+                case -1:
+                    // Fork failed
+                    printf("fork error");
+                    continue;
+
+                default:
+                    waitpid(pid);
+                    break;
+                }
+
+
+                if (execl("/bin/sh") == -1) {
+                    printf("Error running login shell");
+                    
+                }
+
 
                 return 0;
 
