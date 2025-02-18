@@ -146,7 +146,8 @@ int main(int argc, char *argv[]) {
                     continue;
 
                 default:
-                    waitpid(pid);
+                    int status;
+                    waitpid(pid, &status, 0);
                     break;
                 }
 
