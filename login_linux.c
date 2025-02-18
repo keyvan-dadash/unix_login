@@ -132,10 +132,11 @@ int main(int argc, char *argv[]) {
                     printf("fork error");
                     continue;
 
-                default:
-                    int status;
-                    waitpid(pid, &status, 0);
-                    break;
+                default: {
+                        int status;
+                        waitpid(pid, &status, 0);
+                        break;
+                    }
                 }
 
                 return 0;
