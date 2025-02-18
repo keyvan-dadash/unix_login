@@ -18,6 +18,7 @@
 #define FALSE 0
 #define LENGTH 16
 #define PASS_AGE 10
+#define MAX_FAILED 5
 
 void sighandler() {
 
@@ -74,8 +75,14 @@ int main(int argc, char *argv[]) {
 
 		user_pass = getpass(prompt);
 		passwddata = mygetpwnam(user);
-
+        
 		if (passwddata != NULL) {
+
+            if (passwddata->pwfailed > MAX_FAILED) {
+                printf("Max incorrect attempts reached \n");
+                continue;
+            }
+
 			/* You have to encrypt user_pass for this to work */
 			/* Don't forget to include the salt */
 
