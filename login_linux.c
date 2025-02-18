@@ -62,7 +62,9 @@ int main(int argc, char *argv[]) {
 		fflush(NULL); /* Flush all  output buffers */
 		__fpurge(stdin); /* Purge any data in stdin buffer */
 
-		while (fgets(user, LENGTH, stdin) == NULL);
+		if (fgets(user, LENGTH, stdin) == NULL) {
+            exit(0);
+        }
 
         char *ch = user;
         while (*ch != '\n') ch++; 
