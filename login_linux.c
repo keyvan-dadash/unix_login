@@ -11,6 +11,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #include <crypt.h>
+#include <wait.h>
 /* Uncomment next line in step 2 */
  #include "pwent.h" 
 
@@ -24,14 +25,6 @@ void sighandler() {
     signal(SIGTERM, SIG_IGN);
     signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, SIG_IGN);
-	/* add signalhandling routines here */
-	/* see 'man 2 signal' */
-}
-
-void reset_sighandler() {
-    signal(SIGTERM, SIG_DFL);
-    signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
 	/* add signalhandling routines here */
 	/* see 'man 2 signal' */
 }
@@ -121,8 +114,8 @@ int main(int argc, char *argv[]) {
                     continue;
                 }
                 
-                char* args[] = {};
-                char* env[] = {};
+                char* args[] = {NULL};
+                char* env[] = {NULL};
 
                 pid_t pid = fork();
                 switch (pid)
@@ -149,13 +142,6 @@ int main(int argc, char *argv[]) {
                     waitpid(pid, &status, 0);
                     break;
                 }
-
-
-                if (execl("/bin/sh") == -1) {
-                    printf("Error running login shell");
-                    
-                }
-
 
                 return 0;
 
