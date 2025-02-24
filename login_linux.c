@@ -22,6 +22,8 @@
 #define MAX_FAILED 5
 
 void sighandler() {
+
+    // Iterating through all signals (apparently we have 32 different signals in linux) and ignore them.
     for (int i = 0 ; i < 32; i++)
         signal(i, SIG_IGN);
         
@@ -41,6 +43,7 @@ int main(int argc, char *argv[]) {
 
 	char important1[LENGTH] = "**IMPORTANT 1**";
 
+    // Just having a new line char at the end in order to hand the case of password with the size of LENGTH.
 	char user[LENGTH + 1];
     user[LENGTH] = '\n';
 
@@ -68,7 +71,7 @@ int main(int argc, char *argv[]) {
         }
 
         char *ch = user;
-        while (*ch != '\n') ch++; 
+        while (*ch != '\n') ch++; // finding the new line char to replace it with terminator char. 
         *ch = '\0';
 
 
@@ -93,18 +96,19 @@ int main(int argc, char *argv[]) {
 
             // crypt function takes first two char out of true password as salt. 
             // True password also has those two chars in the password before the real password begins.
+            // However, here we have the passwd salt so there isnt any need to pass the true password.
             char *hashed_pass = crypt(user_pass, passwddata->passwd_salt);
             if (!hashed_pass)
                 return 2;
 
-            printf("entered: %s vs true: %s\n", hashed_pass, passwddata->passwd);
+            /*printf("entered: %s vs true: %s\n", hashed_pass, passwddata->passwd);*/
 			if (!strcmp(hashed_pass, passwddata->passwd)) {
 
                 passwddata->pwage++;
                 passwddata->pwfailed = 0;
                 mysetpwent(user, passwddata);
 
-                if (passwddata->pwage >= PASS_AGE)
+                if (passwddata->pwage >= PASS_AGE) // alert the user in the case of coming to the password age time.
                     alert_user();
 
 				printf(" You're in !\n");
@@ -115,15 +119,18 @@ int main(int argc, char *argv[]) {
                 char* args[] = {NULL};
                 char* env[] = {NULL};
 
+                // We are forking a shell.
                 pid_t pid = fork();
                 switch (pid)
                 {
                 case 0:
+                    // We are in child, lets set uid.
                     if (setuid(passwddata->uid) == -1) {
                         printf("Error assigning user permissions");
                         exit(1);
                     }
                     
+                    // Execute bin sh.
                     if (execve("/bin/sh", args, env) == -1) {
                         printf("Could now execute login shell");
                         exit(1);
@@ -137,13 +144,14 @@ int main(int argc, char *argv[]) {
 
                 default: {
                         int status;
+                        // we should wait on the child process.
                         waitpid(pid, &status, 0);
                         break;
                     }
                 }
 
 			} else {
-                sleep(2);
+                sleep(2); // sleep in the case of wrong password.
                 passwddata->pwfailed++;
                 mysetpwent(user, passwddata);
             }
