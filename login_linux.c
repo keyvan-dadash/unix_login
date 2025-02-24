@@ -23,7 +23,7 @@
 
 void sighandler() {
 
-    // Iterating through all signals (apparently we have 32 different signals in linux) and ignore them.
+    // Iterating through all signals (we have 32 different signals in linux) and ignore them.
     for (int i = 0 ; i < 32; i++)
         signal(i, SIG_IGN);
         
